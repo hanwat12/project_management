@@ -113,7 +113,7 @@ class Project(db.Model):
     created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # Relationships
-    tasks = db.relationship('Task', backref='project', lazy='dynamic', cascade='all, delete-orphan')
+    task = db.relationship('Task', backref='project', lazy='dynamic', cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='project', lazy='dynamic', cascade='all, delete-orphan')
     documents = db.relationship('Document', backref='project', lazy='dynamic', cascade='all, delete-orphan')
     assigned_users = db.relationship('User', secondary='project_assignments', back_populates='projects_assigned')
