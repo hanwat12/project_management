@@ -23,15 +23,14 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # configure the database
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
-    # FIX: Use the DATABASE_URL environment variable provided by Railway/hosting service
+    # Using the DATABASE_URL environment variable provided by the hosting service
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     logging.info("Using DATABASE_URL from environment.")
 else:
-    # Fallback to hardcoded URI. NOTE: 'postgres.railway.internal' will ONLY work 
-    # if you run this code inside another Railway service. Change to 'localhost:5432/your_db' 
-    # if developing locally.
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:ccvqOzieQJYIIfSbCPKcRHTHChebsTGY@postgres.railway.internal:5432/railway"
-    logging.warning("DATABASE_URL not found, using hardcoded fallback URI.")
+    # Fallback to a GENERIC local URI. This fallback should ONLY be used for local testing 
+    # where you manually substitute 'user:password@localhost:5432/my_project_db' with valid local credentials.
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user:password@localhost:5432/my_project_db"
+    logging.warning("DATABASE_URL not found, using generic local fallback URI.")
 
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
