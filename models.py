@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -122,7 +122,7 @@ class Project(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
                            onupdate=lambda: datetime.now(timezone.utc))
-    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # Relationships
     tasks = db.relationship('Task', backref='project', lazy='dynamic', cascade='all, delete-orphan')
@@ -188,10 +188,10 @@ class Task(db.Model):
                            onupdate=lambda: datetime.now(timezone.utc))
     completed_at = db.Column(db.DateTime)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
-    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     dependent_on_task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), nullable=True)
-    reassigned_from_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    reassigned_from_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     skill_match_percentage = db.Column(db.Integer, default=0)
 
     # Relationships
@@ -251,11 +251,11 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
-    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) 
+    manager_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 # Secondary user ID, perhaps for mentions
 
 
@@ -267,7 +267,7 @@ class Document(db.Model):
     original_filename = db.Column(db.String(200), nullable=False)
     file_size = db.Column(db.Integer)
     uploaded_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
 
@@ -279,7 +279,7 @@ class UserPermission(db.Model):
     __tablename__ = 'user_permissions'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     module = db.Column(db.String(50), nullable=False)  # Proj, Proj-team, Proj doc, Proj Dis., task
     action = db.Column(db.String(20), nullable=False)  # View, Add, Edit, Delete, Download
     granted = db.Column(db.Boolean, default=False)
@@ -308,7 +308,7 @@ class UserType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     description = db.Column(db.Text)
-    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_active = db.Column(db.Boolean, default=True)
 
@@ -322,7 +322,7 @@ class DocumentComment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
@@ -337,7 +337,7 @@ class DocumentVersion(db.Model):
     document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
     version_number = db.Column(db.Integer, nullable=False)
     filename = db.Column(db.String(200), nullable=False)
-    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     uploaded_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     file_size = db.Column(db.Integer)
     is_current = db.Column(db.Boolean, default=False)
