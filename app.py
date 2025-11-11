@@ -23,10 +23,16 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # configure the database
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
+    # FIX: Use the DATABASE_URL environment variable provided by Railway/hosting service
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    logging.info("Using DATABASE_URL from environment.")
 else:
-    # Fallback to local MySQL for development
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:ccvqOzieQJYIIfSbCPKcRHTHChebsTGY@postgres.railway.internal:5432/railway"
+    # Fallback to hardcoded URI. NOTE: 'postgres.railway.internal' will ONLY work 
+    # if you run this code inside another Railway service. Change to 'localhost:5432/your_db' 
+    # if developing locally.
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:UHOGmTfMHKqNResJErQoHTRedXMNJVmQ@postgres.railway.internal:5432/railway"
+    logging.warning("DATABASE_URL not found, using hardcoded fallback URI.")
+
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -56,5 +62,8 @@ import routes
 # Create tables on startup in production
 if os.environ.get("DATABASE_URL"):
     with app.app_context():
+        # NOTE: This should point to your models file name, which I've updated to 'models.py' based on the trace.
+        import models as models_module
+        import models_extensions as models_extensions_module
         db.create_all()
         print("Database tables created/updated in production.")
