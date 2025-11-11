@@ -9,15 +9,14 @@ class Outcome(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    status = db.Column(db.String(20), default='Pending')  # Pending, Completed
+    status = db.Column(db.String(20), default='Pending')
     deadline = db.Column(db.Date)
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id', ondelete='CASCADE'), nullable=False)
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))
     completed_by_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))
     completed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
-    # Relationships
     task = db.relationship('Task', backref=db.backref('outcomes', lazy='dynamic', cascade='all, delete-orphan'))
     created_by = db.relationship('User', foreign_keys=[created_by_id])
     completed_by = db.relationship('User', foreign_keys=[completed_by_id])
