@@ -26,13 +26,13 @@ if database_url:
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
     # Fallback to local MySQL for development
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:UHOGmTfMHKqNResJErQoHTRedXMNJVmQ@postgres.railway.internal:5432/railway"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://webuser:StrongPassword123@localhost/project_mgmt"
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
 
 # initialize extensions
 db.init_app(app)
@@ -50,7 +50,3 @@ def load_user(user_id):
 
 # Import and register routes
 import routes
-
-with app.app_context():
-    db.create_all()
-    logging.info("Database tables created successfully.")
